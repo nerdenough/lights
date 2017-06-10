@@ -1,19 +1,48 @@
 <template>
   <div class="setup">
-    <form class="form">
+    <div class="form">
       <h1 class="title">Lights</h1>
-      <input type="text" class="address" v-model="address" placeholder="Your Hue IP Address">
-      <button class="submit">Connect</button>
-    </form>
+      <input class="address" type="text" v-model="address" placeholder="Your Hue IP Address">
+      <p class="error" v-if="error">{{ error }}</p>
+      <button class="submit" @click="connect">Connect</button>
+    </div>
   </div>
 </template>
 
 <script>
+async function getUsername () {
+  const res = await this.$http.post(`http://${this.address}/api`, {
+    devicetype: 'lights#web'
+  }).then(res => res.body[0])
+
+  if (res.error) {
+    setTimeout(this.getUsername, 1000)
+    console.log('press link')
+  } else {
+    const username = res.success.username
+    console.log(username)
+  }
+}
+
+async function connect () {
+  try {
+    await this.$http.get(`http://${this.address}/api/test/config`)
+    await this.getUsername()
+  } catch (err) {
+    this.error = 'Unable to find a Hue bridge at this address!'
+  }
+}
+
 export default {
   name: 'setup',
   data: () => ({
-    address: ''
-  })
+    address: '',
+    error: null
+  }),
+  methods: {
+    connect,
+    getUsername
+  }
 }
 </script>
 
@@ -48,6 +77,7 @@ export default {
     font-weight: bold;
     text-align: center;
     outline: none;
+    margin-bottom: 10px;
     padding: 20px;
     @include border;
     @include box-sizing;
@@ -57,6 +87,11 @@ export default {
     }
   }
 
+  .error {
+    color: $red;
+    font-size: 16px;
+  }
+
   .submit {
     background: $green;
     color: white;
@@ -64,7 +99,7 @@ export default {
     font-weight: bold;
     cursor: pointer;
     outline: none;
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 20px;
     @include border;
   }
