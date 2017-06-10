@@ -1,0 +1,29 @@
+// Fonts
+$base-font: 'Noto Sans', sans-serif;
+
+// Colors
+$dark-grey: #080808;
+$medium-grey: #808080;
+$green: #52C752;
+
+// Mixins
+@mixin box-sizing () {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+@mixin border () {
+  border: none;
+  border-radius: 5px;
+}
+
+// Defaults
+html, body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
