@@ -3,15 +3,22 @@
     <h1 class="title">Lights</h1>
     <input class="address" type="text" v-model="address" placeholder="Your Hue IP Address">
     <p class="error" v-if="error">{{ error }}</p>
-    <button class="submit" @click="connect(address)">Connect</button>
+    <button class="submit" v-if="!inProgress" @click="connect(address)">Connect</button>
+    <spinner v-else></spinner>
   </div>
 </template>
 
 <script>
+import Spinner from '@/components/shared/Spinner'
+
 export default {
   name: 'setup-page',
+  components: {
+    Spinner
+  },
   props: {
     error: String,
+    inProgress: Boolean,
     connect: {
       type: Function,
       required: true

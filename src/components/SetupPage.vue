@@ -1,6 +1,6 @@
 <template>
   <div class="setup">
-    <setup-form :connect="connect" :error="error"></setup-form>
+    <setup-form :connect="connect" :error="error" :inProgress="inProgress"></setup-form>
   </div>
 </template>
 
@@ -22,13 +22,17 @@ async function getUsername (address) {
 }
 
 async function connect (address) {
+  this.inProgress = true
   this.error = null
+
   try {
     await this.$http.get(`http://${address}/api/test/config`)
     await this.getUsername(address)
   } catch (err) {
     this.error = 'Unable to find a Hue bridge at this address!'
   }
+
+  this.inProgress = false
 }
 
 export default {
@@ -37,7 +41,8 @@ export default {
     SetupForm
   },
   data: () => ({
-    error: null
+    error: null,
+    inProgress: false
   }),
   methods: {
     connect,
