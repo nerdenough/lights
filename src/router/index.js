@@ -9,11 +9,11 @@ export default new Router({
   mode: 'history',
   routes: [{
     path: '/',
-    name: 'Hello',
+    name: 'dashboard',
     component: Hello
   }, {
     path: '/setup',
-    name: 'Setup',
+    name: 'setup',
     component: SetupPage
   }]
 })

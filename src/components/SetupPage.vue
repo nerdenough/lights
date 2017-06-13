@@ -2,7 +2,8 @@
   <div class="setup">
     <div class="setup-form">
       <h1 class="title">Lights</h1>
-      <input class="address" type="text" v-model="address" placeholder="Your Hue IP Address">
+      <p class="info" v-if="authenticating">Press the button on your Hue bridge to finish connecting</p>
+      <input class="address" v-else type="text" v-model="address" placeholder="Your Hue IP Address">
       <p class="error" v-if="error">{{ error }}</p>
       <button class="submit" v-if="!inProgress" @click="submit()">Connect</button>
       <spinner v-else></spinner>
@@ -20,19 +21,25 @@ async function submit () {
   this.error = null
 
   await this.connect({ address }).catch(() => {
+    this.inProgress = false
     this.error = 'Unable to find a Hue bridge at this address!'
   })
 
   if (this.error) {
-    this.inProgress = false
     return
   }
 
+  this.authenticating = true
+
   await this.authenticate({ address }).catch(() => {
+    this.authenticating = false
+    this.inProgress = false
     this.error = 'Unable to authenticate with the Hue bridge'
   })
 
-  this.inProgress = false
+  if (!this.error) {
+    this.$router.push({ name: 'dashboard' })
+  }
 }
 
 export default {
@@ -41,6 +48,7 @@ export default {
     Spinner
   },
   data: () => ({
+    authenticating: null,
     error: null,
     address: '',
     inProgress: false
@@ -94,6 +102,12 @@ export default {
     &::placeholder {
       color: $medium-grey;
     }
+  }
+
+  .info {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 10px;
   }
 
   .error {
