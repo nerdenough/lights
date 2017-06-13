@@ -4,39 +4,33 @@
       <h1 class="title">Lights</h1>
       <input class="address" type="text" v-model="address" placeholder="Your Hue IP Address">
       <p class="error" v-if="error">{{ error }}</p>
-      <button class="submit" v-if="!inProgress" @click="connect">Connect</button>
+      <button class="submit" v-if="!inProgress" @click="submit()">Connect</button>
       <spinner v-else></spinner>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import Spinner from '@/components/shared/Spinner'
 
-async function getUsername () {
-  const res = await this.$http.post(`http://${this.address}/api`, {
-    devicetype: 'lights#web'
-  }).then(res => res.body[0])
-
-  if (res.error) {
-    setTimeout(this.getUsername, 1000, this.address)
-    console.log('press link')
-  } else {
-    const username = res.success.username
-    console.log(username)
-  }
-}
-
-async function connect () {
+async function submit () {
+  const address = this.address
   this.inProgress = true
   this.error = null
 
-  try {
-    await this.$http.get(`http://${this.address}/api/test/config`)
-    await this.getUsername()
-  } catch (err) {
+  await this.connect({ address }).catch(() => {
     this.error = 'Unable to find a Hue bridge at this address!'
+  })
+
+  if (this.error) {
+    this.inProgress = false
+    return
   }
+
+  await this.authenticate({ address }).catch(() => {
+    this.error = 'Unable to authenticate with the Hue bridge'
+  })
 
   this.inProgress = false
 }
@@ -52,8 +46,11 @@ export default {
     inProgress: false
   }),
   methods: {
-    connect,
-    getUsername
+    ...mapActions([
+      'authenticate',
+      'connect'
+    ]),
+    submit
   }
 }
 </script>
