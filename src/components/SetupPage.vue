@@ -1,19 +1,25 @@
 <template>
   <div class="setup">
-    <setup-form :connect="connect" :error="error" :inProgress="inProgress"></setup-form>
+    <div class="setup-form">
+      <h1 class="title">Lights</h1>
+      <input class="address" type="text" v-model="address" placeholder="Your Hue IP Address">
+      <p class="error" v-if="error">{{ error }}</p>
+      <button class="submit" v-if="!inProgress" @click="connect">Connect</button>
+      <spinner v-else></spinner>
+    </div>
   </div>
 </template>
 
 <script>
-import SetupForm from '@/components/SetupPage/SetupForm.vue'
+import Spinner from '@/components/shared/Spinner'
 
-async function getUsername (address) {
-  const res = await this.$http.post(`http://${address}/api`, {
+async function getUsername () {
+  const res = await this.$http.post(`http://${this.address}/api`, {
     devicetype: 'lights#web'
   }).then(res => res.body[0])
 
   if (res.error) {
-    setTimeout(this.getUsername, 1000, address)
+    setTimeout(this.getUsername, 1000, this.address)
     console.log('press link')
   } else {
     const username = res.success.username
@@ -21,13 +27,13 @@ async function getUsername (address) {
   }
 }
 
-async function connect (address) {
+async function connect () {
   this.inProgress = true
   this.error = null
 
   try {
-    await this.$http.get(`http://${address}/api/test/config`)
-    await this.getUsername(address)
+    await this.$http.get(`http://${this.address}/api/test/config`)
+    await this.getUsername()
   } catch (err) {
     this.error = 'Unable to find a Hue bridge at this address!'
   }
@@ -38,10 +44,11 @@ async function connect (address) {
 export default {
   name: 'setup',
   components: {
-    SetupForm
+    Spinner
   },
   data: () => ({
     error: null,
+    address: '',
     inProgress: false
   }),
   methods: {
@@ -58,5 +65,55 @@ export default {
   width: 100%;
   height: 100%;
   background: $dark-grey;
+}
+
+.setup-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 320px;
+  min-width: 280px;
+  text-align: center;
+
+  .title {
+    color: white;
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  .address {
+    width: 100%;
+    color: $medium-grey;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    outline: none;
+    margin-bottom: 10px;
+    padding: 20px;
+    @include border;
+    @include box-sizing;
+
+    &::placeholder {
+      color: $medium-grey;
+    }
+  }
+
+  .error {
+    color: $red;
+    font-size: 16px;
+  }
+
+  .submit {
+    background: $green;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+    margin-top: 10px;
+    padding: 20px;
+    @include border;
+  }
 }
 </style>
