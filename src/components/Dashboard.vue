@@ -4,8 +4,18 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
-  name: 'dashboard'
+  name: 'dashboard',
+  methods: {
+    ...mapActions([
+      'getLights'
+    ])
+  },
+  async created () {
+    await this.getLights()
+  }
 }
 </script>
 

@@ -13,15 +13,21 @@ async function authenticate ({ commit }, { address }) {
     })
   }
 
-  commit('setUsername', { username: res.success.username })
+  commit('username', { username: res.success.username })
 }
 
 async function connect ({ commit }, { address }) {
   await Vue.http.get(`http://${address}/api/test/config`)
-  commit('setAddress', { address })
+  commit('address', { address })
+}
+
+async function getLights ({ commit, state }) {
+  const lights = await Vue.http.get(`http://${state.address}/api/${state.username}/lights`).then(res => res.body)
+  commit('lights', { lights })
 }
 
 export const actions = {
   authenticate,
-  connect
+  connect,
+  getLights
 }

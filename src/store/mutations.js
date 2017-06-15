@@ -1,13 +1,17 @@
 export const state = {
   address: null,
-  username: null
+  username: null,
+  lights: null
 }
 
 export const mutations = {
-  setAddress (state, { address }) {
+  address (state, { address }) {
     state.address = address
   },
-  setUsername (state, { username }) {
+  username (state, { username }) {
     state.username = username
+  },
+  lights (state, { lights }) {
+    state.lights = lights
   }
 }
