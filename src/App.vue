@@ -6,7 +6,13 @@
 
 <script>
 export default {
-  name: 'app'
+  name: 'app',
+  created () {
+    const { address, username } = this.$store.state
+    if (!address || !username) {
+      this.$router.push({ name: 'setup' })
+    }
+  }
 }
 </script>
 
